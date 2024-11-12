@@ -1,0 +1,138 @@
+算家云热门大模型[Flux](https://www.suanjiayun.com/mirrorDetails?id=66bd79de88f260b62e269b62)，一键使用！
+
+# 一、介绍
+
+Flux.1：当前地表最强开源AI画图模型
+
+flux.1由Black Forest Labs（黑森林实验室）推出，而Black Forest Labs是Robin Rombach带领研究团队（Stable Diffusion 的核心成员）离开 Stability AI 创立的，所以也可以说是SD的原班人马打造。
+
+由下图可以看出Flux.1模型表现出的效果已经超越了SD3、DALL·E3(HD)和Midjourney v6.0，具有强大的出图能力。
+![image.png](https://foruda.gitee.com/images/1723173628350439742/e5dc33c8_14633769.png)
+
+Flux.1模型在出图细节、文字生成以及人手生成上都具有极强的表现。
+
+![image.png](https://foruda.gitee.com/images/1723174568055151335/ecfbfdf4_14633769.png)
+
+从图上可以看出，Flux.1即使在面对大段文字时也有出色表现，而且还有艺术字的效果。
+
+![image.png](https://foruda.gitee.com/images/1723174743969152227/5ff05d4f_14633769.png)
+
+在手的生成上也没有出现多手、扭曲等问题，可以说AI终于懂得如何做手了。
+
+感兴趣的也可点击官网详细了解：[Black Forest Labs - Frontier AI Lab](https://blackforestlabs.ai/)
+
+接下来就谈谈如何部署吧~
+
+# 二、部署
+
+要求：
+
+显存 >= 18G
+CUDA版本>=11.8
+
+## 1. 部署ComfyUI
+
+本篇的模型部署是在ComfyUI的基础上进行，如果没有部署过ComfyUI，请按照下面流程先进行部署，如已安装请跳过该步：
+
+#### （1）使用命令克隆 ComfyUI
+
+```
+git clone https://github.com/comfyanonymous/ComfyUI.git
+cd ComfyUI
+```
+
+#### （2）安装 conda（如已安装则跳过）
+
+下面需要使用 Anaconda 或 Mimiconda 创建虚拟环境，可以输入 `conda --version` 进行检查。下面是 Mimiconda 的安装过程：
+
+* 下载 Miniconda 安装脚本
+
+```
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+```
+
+* 运行安装脚本
+
+```
+bash Miniconda3-latest-Linux-x86_64.sh
+```
+
+* 遵循安装提示并初始化
+
+按 Enter 键查看许可证条款，阅读完毕后输入 `yes` 接受条款，安装完成后，脚本会询问是否初始化 conda 环境，输入 `yes` 并按 Enter 键。
+
+* 运行 `source ~/.bashrc` 命令激活 conda 环境
+* 再次输入 `conda --version` 命令来验证是否安装成功，如果出现类似 `conda 4.10.3` 这样的输出就成功了。
+
+#### （3）创建虚拟环境
+
+输入下面的命令：
+
+```
+conda create -n comfyui
+conda activate comfyui
+```
+
+#### （4）安装 pytorch
+
+```
+pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121
+```
+
+#### （5）安装项目依赖
+
+```
+pip install -r requirements.txt
+```
+
+此时所需环境就已经搭建完成，通过下面命令进行启动：
+
+```
+python main.py
+```
+
+访问网址得到类似下图界面即表示成功启动：
+
+![image.png](https://foruda.gitee.com/images/1722564255358436394/419bea3e_14633769.png)
+
+到这里Comfy UI就初步搭建好了（这里只是简单实现ComfyUI的基础功能，如果想要安装更多细节，请看我“Comfy UI”部署教程）
+
+## 2. 部署Flux.1
+
+如果你的ComfyUI是在Flux.1模型发布前部署的，那么请先进行更新。
+
+### （1）下载Flux.1模型
+
+官方提供了Flux.1系列模型，共有三个：Flux.1[pro]是闭源的，可以从官方 API 申请访问权限，同时支持企业定制。Flux.1[dev]开源，不可商用，直接从 FLUX.1 [pro] 蒸馏而来，具备相似的图像质量和提示词遵循能力，但是更高效。Flux.1[schnell]：开源模型，可商用，专门为本地开发和个人使用量身定制，生成速度最快，内存占用也最小。
+
+进入[hugging face](https://huggingface.co)网站，点击搜索“flux.1”然后选择dev模型
+
+![image.png](https://foruda.gitee.com/images/1723176276452447695/1ee9eba2_14633769.png)
+
+然后点击文件模型就可以看到下图的相关文件
+
+![image.png](https://foruda.gitee.com/images/1723176372228700696/aff6555d_14633769.png)
+
+将该模型下载到 `/ComfyUI/models/unet/`文件夹下，如果这个模型对于你太大就搜索“flux-fp8”下载11.9G的模型。将ae.safetensors下载到 `/ComfyUI/models/vae/`文件夹下。
+
+### （2）下载Clip模型
+
+在hugging face搜索栏搜索”flux_text_encoders“，点击进去
+
+![image.png](https://foruda.gitee.com/images/1723191073969657405/deee4ed7_14633769.png)
+
+下载clip_l和t5xxl模型，其中t5xxl模型有两个，根据自己的显卡情况二选一下载（如果你有超过 16GB 的 ram，建议使用 fp32），放置在 `ComfyUI/models/clip/`文件夹下。
+
+![image.png](https://foruda.gitee.com/images/1723191190596655222/fef1b8b9_14633769.png)
+
+### （3）下载工作流
+
+进入网站：[Flux Examples | ComfyUI_examples (comfyanonymous.github.io)](https://comfyanonymous.github.io/ComfyUI_examples/flux/)并将下图下载，然后拖入Comfy UI中：
+
+![image.png](https://foruda.gitee.com/images/1723191741001299756/653d07ea_14633769.png)
+
+然后你的ComfyUI中应该会出选相应的工作流，类似下图:
+
+![image.png](https://foruda.gitee.com/images/1723192360234281373/e09ad9ad_14633769.png)
+
+至此Flux.1模型就部署在Comfy UI中了，开启你的探索之旅吧！
